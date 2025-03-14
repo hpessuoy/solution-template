@@ -1,0 +1,16 @@
+tag-prefix: '[vV]'
+assembly-versioning-scheme: MajorMinorPatch
+
+branches:
+  main:
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    regex: ^main$
+    source-branches: ['crutch']
+  crutch:
+    tag: 'crutch'
+    increment: Minor
+    regex: ^crutch
+    source-branches: []
