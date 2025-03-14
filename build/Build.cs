@@ -32,7 +32,7 @@ class Build : NukeBuild
     IEnumerable<Project> UnitTestProjects => Solution.GetAllProjects("*.Tests.Unit");
     IEnumerable<Project> IntegrationTestProjects => Solution.GetAllProjects("*.Tests.Integration");
 
-    const string GithubContainerRegistryNamespace = "ghcr.io/youcefmzg/solution-template";
+    const string GithubContainerRegistryNamespace = "ghcr.io/hpessuoy/solution-template";
     const string DeploymentContainerImageName = "solution-template-deployment";
 
     readonly string DeploymentImageTag = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER") ??
