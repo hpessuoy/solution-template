@@ -1,60 +1,74 @@
-$ErrorActionPreference = "Stop"
+[CmdletBinding()]
+Param(
+    [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
+    [string[]]$BuildArguments
+)
 
-function Show-Message
-{
-    param ([string]$message)
+Write-Output "PowerShell $($PSVersionTable.PSEdition) version $($PSVersionTable.PSVersion)"
 
-    # Get current time formatted as HH:mm:ss
-    $time = Get-Date -Format "HH:mm:ss"
+Set-StrictMode -Version 2.0; $ErrorActionPreference = "Stop"; $ConfirmPreference = "None"; trap { Write-Error $_ -ErrorAction Continue; exit 1 }
+$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
 
-    # Format the log message
-    $logMessage = "$time [INF] > $message"
+###########################################################################
+# CONFIGURATION
+###########################################################################
 
-    # Print the log message with coloration
-    Write-Host "$time" -ForegroundColor Cyan -NoNewline
-    Write-Host " [INF]" -ForegroundColor Blue -NoNewline
-    Write-Host " > $message" -ForegroundColor Green
-    Write-Host ""
+$BuildProjectFile = "$PSScriptRoot\build\Build.csproj"
+$TempDirectory = "$PSScriptRoot\.nuke\temp"
+
+$DotNetGlobalFile = "$PSScriptRoot\global.json"
+$DotNetInstallUrl = "https://dot.net/v1/dotnet-install.ps1"
+$DotNetChannel = "STS"
+
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
+$env:DOTNET_CLI_TELEMETRY_OPTOUT = 1
+$env:DOTNET_MULTILEVEL_LOOKUP = 0
+
+###########################################################################
+# EXECUTION
+###########################################################################
+
+function ExecSafe([scriptblock] $cmd) {
+    & $cmd
+    if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 
-if ($args[0] -eq "local")
-{
-    Show-Message "Building Locally"
-    dotnet run --project build/Build.csproj -c Release -- $args[1..($args.Count)]
-    exit 0;
+# If dotnet CLI is installed globally and it matches requested version, use for execution
+if ($null -ne (Get-Command "dotnet" -ErrorAction SilentlyContinue) -and `
+     $(dotnet --version) -and $LASTEXITCODE -eq 0) {
+    $env:DOTNET_EXE = (Get-Command "dotnet").Path
+}
+else {
+    # Download install script
+    $DotNetInstallFile = "$TempDirectory\dotnet-install.ps1"
+    New-Item -ItemType Directory -Path $TempDirectory -Force | Out-Null
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    (New-Object System.Net.WebClient).DownloadFile($DotNetInstallUrl, $DotNetInstallFile)
+
+    # If global.json exists, load expected version
+    if (Test-Path $DotNetGlobalFile) {
+        $DotNetGlobal = $(Get-Content $DotNetGlobalFile | Out-String | ConvertFrom-Json)
+        if ($DotNetGlobal.PSObject.Properties["sdk"] -and $DotNetGlobal.sdk.PSObject.Properties["version"]) {
+            $DotNetVersion = $DotNetGlobal.sdk.version
+        }
+    }
+
+    # Install by channel or version
+    $DotNetDirectory = "$TempDirectory\dotnet-win"
+    if (!(Test-Path variable:DotNetVersion)) {
+        ExecSafe { & powershell $DotNetInstallFile -InstallDir $DotNetDirectory -Channel $DotNetChannel -NoPath }
+    } else {
+        ExecSafe { & powershell $DotNetInstallFile -InstallDir $DotNetDirectory -Version $DotNetVersion -NoPath }
+    }
+    $env:DOTNET_EXE = "$DotNetDirectory\dotnet.exe"
 }
 
-Show-Message "Building in docker (use './build.ps1 local' to build without using docker)"
+Write-Output "Microsoft (R) .NET SDK version $(& $env:DOTNET_EXE --version)"
 
-$GITHUB_TOKEN = $Env:GITHUB_TOKEN
-$GITHUB_RUN_NUMBER = $Env:GITHUB_RUN_NUMBER
-
-if ($null -eq $GITHUB_TOKEN -or $GITHUB_TOKEN -eq "")
-{
-    Write-Error "GITHUB_TOKEN environment variable empty or missing."
+if (Test-Path env:NUKE_ENTERPRISE_TOKEN) {
+    & $env:DOTNET_EXE nuget remove source "nuke-enterprise" > $null
+    & $env:DOTNET_EXE nuget add source "https://f.feedz.io/nuke/enterprise/nuget" --name "nuke-enterprise" --username "PAT" --password $env:NUKE_ENTERPRISE_TOKEN > $null
 }
 
-if ($null -eq $GITHUB_RUN_NUMBER -or $GITHUB_RUN_NUMBER -eq "")
-{
-    Write-Warning "GITHUB_RUN_NUMBER environment variable empty or missing."
-}
-
-$tag = "solution-template-build"
-
-# Build the build environment image.
-docker build `
- --build-arg GITHUB_TOKEN=$GITHUB_TOKEN `
- --build-arg GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER `
- -f build.dockerfile `
- --tag $tag.
-
-# Build inside build environment
-docker run --rm --name $tag `
- -v /var/run/docker.sock:/var/run/docker.sock `
- -v $PWD/artifacts:/repo/artifacts `
- -v $PWD/temp:/repo/temp `
- --network host `
- -e NUGET_PACKAGES=/repo/temp/nuget-packages `
- $tag `
- dotnet run --project build/Build.csproj -c Release -- $args
- 
+ExecSafe { & $env:DOTNET_EXE build $BuildProjectFile /nodeReuse:false /p:UseSharedCompilation=false -nologo -clp:NoSummary --verbosity quiet }
+ExecSafe { & $env:DOTNET_EXE run --project $BuildProjectFile --no-build -- $BuildArguments }

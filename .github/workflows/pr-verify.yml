@@ -22,12 +22,8 @@ jobs:
       - name: Log into container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
-      - name: Build and Test
-        run: ./build.ps1
-        shell: pwsh
-        working-directory: .
-        
-      - name: Push Deployment Container
-        run: ./build.ps1 -Target PushDeploymentContainer
-        shell: pwsh
-        working-directory: .
+      - name: Build
+        uses: ./.github/templates/build-nuke
+        with:
+          nukeStepName: "Build"
+          nukeTarget: "Compile"

@@ -1,0 +1,31 @@
+name: "Nuke Build Target"
+description: "Prepare the Dotnet environment"
+
+inputs:
+  nukeStepName:
+    description: "The Nuke step name"
+    required: true
+
+  nukeTarget:
+    description: "The Nuke target to run"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET for Build
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: "global.json"
+
+    - name: Cache ~/.nuget/packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+
+    - name: ${{ inputs.nukeStepName }}
+      shell: pwsh
+      working-directory: .
+      run: |
+        ./build.ps1 ${{ inputs.nukeTarget }} 

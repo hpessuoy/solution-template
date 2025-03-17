@@ -33,6 +33,7 @@
         "Publish",
         "PublishDeploy",
         "PublishInfra",
+        "PushDeploymentContainer",
         "Restore",
         "UnitTests"
       ]

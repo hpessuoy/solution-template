@@ -67,8 +67,6 @@ class Build : NukeBuild
     Target Clean => d => d
         .Executes(() =>
         {
-            // TODO: setup serilog properly
-            // Serilog.Log.Information($"Cleaning bin artifact");
             BinaryArtifactsDirectory.CreateOrCleanDirectory();
             TestResultsDirectory.CreateOrCleanDirectory();
             IntegrationTestsResultDirectory.CreateOrCleanDirectory();
@@ -79,7 +77,6 @@ class Build : NukeBuild
                 .SetVerbosity(DotNetVerbosity.quiet));
 
             // Solution.Directory.GlobDirectories("*/bin", "*/obj").DeleteDirectories();
-            // Serilog.Log.Information($"Cleaning bin and obj directories");
         });
 
     Target Restore => d => d
