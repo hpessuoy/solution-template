@@ -2,13 +2,18 @@ name: "Nuke Build Target"
 description: "Prepare the Dotnet environment"
 
 inputs:
-  nukeStepName:
+  stepName:
     description: "The Nuke step name"
     required: true
 
-  nukeTarget:
+  target:
     description: "The Nuke target to run"
     required: true
+    
+  args:
+    description: "Additional arguments"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -24,8 +29,8 @@ runs:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
 
-    - name: ${{ inputs.nukeStepName }}
+    - name: ${{ inputs.stepName }}
       shell: pwsh
       working-directory: .
       run: |
-        ./build.ps1 ${{ inputs.nukeTarget }} 
+        ./build.ps1 -Target ${{ inputs.target }} ${{ inputs.args }} 

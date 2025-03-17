@@ -25,5 +25,5 @@ jobs:
       - name: Build
         uses: ./.github/templates/build-nuke
         with:
-          nukeStepName: "Build"
-          nukeTarget: "Compile"
+          stepName: "Build"
+          target: "Compile"
