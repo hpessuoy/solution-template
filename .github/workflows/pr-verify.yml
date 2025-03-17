@@ -40,3 +40,23 @@ jobs:
         with:
           stepName: "Unit Test"
           target: "UnitTests"
+
+      - name: Publish Test Results Summary
+        if: always()
+        run: cat artifacts/test-results/*.md > $GITHUB_STEP_SUMMARY
+
+      - name: Ls coverage folder
+        if: always()
+        run: ls -l artifacts/coverage
+
+      - name: Ls unit test folder
+        if: always()
+        run: ls -l artifacts/test-results
+
+      - name: Publish Code Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            artifacts/coverage
+            artifacts/test-results

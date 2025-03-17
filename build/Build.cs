@@ -100,8 +100,9 @@ class Build : NukeBuild
             );
         });
 
+    // We depend on Compile, but we don't specify it to avoid compiling twice as the CI runs Compile then UnitTests
     Target UnitTests => d => d
-        .DependsOn(Compile)
+        .After(Compile) 
         .Executes(() =>
         {
             DotNetTest(settings => settings.SetConfiguration(Configuration)
@@ -185,7 +186,8 @@ class Build : NukeBuild
         .After(BuildContainer)
         .Executes(() =>
         {
-            Command.Run("docker", $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
+            Command.Run("docker",
+                $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
         });
 
     Target Default => d => d
