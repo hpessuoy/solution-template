@@ -8,8 +8,6 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
-#    env:
-#      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     timeout-minutes: 15
 
     steps:
@@ -17,10 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-#      - name: Log into container registry
-#        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          
+         
       - name: Build
         uses: ./.github/templates/build-nuke
         with:
@@ -40,10 +35,6 @@ jobs:
         with:
           stepName: "Unit Test"
           target: "UnitTests"
-
-      - name: Publish Test Results Summary
-        if: always()
-        run: pwd
 
       - name: Publish Test Results Summary
         if: always()
