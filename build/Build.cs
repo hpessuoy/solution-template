@@ -4,39 +4,47 @@ using SimpleExec;
 
 class Build : NukeBuild
 {
-    [Parameter] readonly string ArtifactoryUsername;
-    [Parameter] readonly string ArtifactoryPassword;
-    [Parameter] readonly string ArtifactoryNugetSourceUrl;
+    [Parameter] public readonly string ArtifactoryUsername;
+    [Parameter] public readonly string ArtifactoryPassword;
+    [Parameter] public readonly string ArtifactoryNugetSourceUrl;
 
-    [Parameter] readonly string AssemblySemVer;
-    [Parameter] readonly string AssemblySemFileVer;
-    [Parameter] readonly string InformationalVersion;
+    [Parameter] public readonly string AssemblySemVer;
+    [Parameter] public readonly string AssemblySemFileVer;
+    [Parameter] public readonly string InformationalVersion;
 
-    [GitRepository] [Required] readonly GitRepository GitRepository;
-    [Solution] readonly Solution Solution;
+    [GitRepository] [Required] public readonly GitRepository GitRepository;
+    [Solution] public readonly Solution Solution;
 
     const string ProjectName = "Api";
+
     Project Project => Solution.GetAllProjects("*").Single(p => ProjectName.Equals(p.Name, StringComparison.Ordinal));
 
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+
     AbsolutePath BinaryArtifactsDirectory => ArtifactsDirectory / "app/bin";
+
     AbsolutePath InfraArtifactsDirectory => ArtifactsDirectory / "app/infra";
+
     AbsolutePath DeployArtifactsDirectory => ArtifactsDirectory / "app/deploy";
+
     AbsolutePath TestResultsDirectory => ArtifactsDirectory / "test-results";
+
     AbsolutePath IntegrationTestsResultDirectory => ArtifactsDirectory / "integration-test-results";
+
     AbsolutePath CoverageReportsDirectory => ArtifactsDirectory / "coverage";
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+    public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     IEnumerable<Project> UnitTestProjects => Solution.GetAllProjects("*.Tests.Unit");
+
     IEnumerable<Project> IntegrationTestProjects => Solution.GetAllProjects("*.Tests.Integration");
 
     const string GithubContainerRegistryNamespace = "ghcr.io/hpessuoy/solution-template";
     const string DeploymentContainerImageName = "solution-template-deployment";
 
-    readonly string DeploymentImageTag = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER") ??
-                                         "GITHUB_RUN_NUMBER-not-available";
+    readonly string _deploymentImageTag = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER") ??
+                                          "GITHUB_RUN_NUMBER-not-available";
 
     Target ConfigureNuget => tgt => tgt
         .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(ArtifactoryNugetSourceUrl)
@@ -88,6 +96,27 @@ class Build : NukeBuild
                 .SetVerbosity(DotNetVerbosity.quiet));
         });
 
+    Target Lint => d => d
+        .DependsOn(Restore)
+        .Executes(() =>
+        {
+            DotNetBuild(configurator => configurator
+                .SetConfiguration(Configuration)
+                .SetNoRestore(true)
+                .SetVerbosity(DotNetVerbosity.quiet)
+                .SetRepositoryUrl(GitRepository.HttpsUrl)
+                .AddWarningsAsErrors()
+            );
+        });
+
+    Target FormatCheck => d => d
+        .After(Lint)
+        .Executes(() =>
+        {
+            DotNetFormat(configurator => configurator
+                .SetVerifyNoChanges(true));
+        });
+
     Target Compile => d => d
         .DependsOn(Restore)
         .Executes(() =>
@@ -102,7 +131,7 @@ class Build : NukeBuild
 
     // We depend on Compile, but we don't specify it to avoid compiling twice as the CI runs Compile then UnitTests
     Target UnitTests => d => d
-        .After(Compile) 
+        .After(Compile)
         .Executes(() =>
         {
             DotNetTest(settings => settings.SetConfiguration(Configuration)
@@ -179,7 +208,7 @@ class Build : NukeBuild
                 .SetTag(DeploymentContainerImageName));
 
             Command.Run("docker",
-                $"tag {DeploymentContainerImageName}:latest {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
+                $"tag {DeploymentContainerImageName}:latest {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{_deploymentImageTag}");
         });
 
     Target PushDeploymentContainer => d => d
@@ -187,7 +216,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             Command.Run("docker",
-                $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
+                $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{_deploymentImageTag}");
         });
 
     Target Default => d => d

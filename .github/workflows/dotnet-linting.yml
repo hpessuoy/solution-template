@@ -1,0 +1,29 @@
+name: .NET Linting
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Linter (StyleCop)
+        uses: ./.github/templates/build-nuke
+        with:
+          stepName: "Run Linter (StyleCop)"
+          target: "Lint"
+          
+      - name: Run Format Check
+        uses: ./.github/templates/build-nuke
+        with:
+          stepName: "Run Format Check"
+          target: "FormatCheck"

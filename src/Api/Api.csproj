@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Api</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 <!--    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>-->
   </PropertyGroup>
   
@@ -16,4 +17,10 @@
     <Folder Include="obj\"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
+  
 </Project>

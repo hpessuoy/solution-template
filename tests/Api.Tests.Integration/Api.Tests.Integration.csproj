@@ -8,6 +8,7 @@
     <IsPublishable>false</IsPublishable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +21,12 @@
 
   <ItemGroup>
     <Using Include="Xunit"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
   </ItemGroup>
 
 </Project>
