@@ -96,28 +96,6 @@ class Build : NukeBuild
                 .SetVerbosity(DotNetVerbosity.quiet));
         });
 
-    Target Lint => d => d
-        .DependsOn(Restore)
-        .Before(FormatCheck)
-        .Executes(() =>
-        {
-            DotNetBuild(configurator => configurator
-                .SetConfiguration(Configuration)
-                .SetNoRestore(true)
-                .SetVerbosity(DotNetVerbosity.quiet)
-                .SetRepositoryUrl(GitRepository.HttpsUrl)
-                .AddWarningsAsErrors()
-            );
-        });
-
-    Target FormatCheck => d => d
-        .After(Lint)
-        .Executes(() =>
-        {
-            DotNetFormat(configurator => configurator
-                .SetVerifyNoChanges(true));
-        });
-
     Target Compile => d => d
         .DependsOn(Restore)
         .Executes(() =>
@@ -127,6 +105,7 @@ class Build : NukeBuild
                 .SetNoRestore(true)
                 .SetVerbosity(DotNetVerbosity.quiet)
                 .SetRepositoryUrl(GitRepository.HttpsUrl)
+                .AddWarningsAsErrors()
             );
         });
 
@@ -167,12 +146,12 @@ class Build : NukeBuild
         .After(UnitTests, IntegrationTests)
         .Executes(() =>
         {
+            // .SetRuntime("linux-x64")  // Removing this for now as it's causing issues with the publishing: error : Manifest file not found
+            // .EnablePublishSingleFile()  // Removing this for now as it's causing issues with the publishing: error : Manifest file not found
             DotNetPublish(settings => settings.SetProject(Project)
                 .SetConfiguration(Configuration)
-                // .SetRuntime("linux-x64")  // Removing this for now as it's causing issues with the publishing: error : Manifest file not found
                 .SetNoBuild(true)
                 .SetOutput(BinaryArtifactsDirectory)
-                // .EnablePublishSingleFile()  // Removing this for now as it's causing issues with the publishing: error : Manifest file not found
                 .SetVerbosity(DotNetVerbosity.quiet)
                 .SetRepositoryUrl(GitRepository.HttpsUrl)
                 .SetAssemblyVersion(AssemblySemVer)

@@ -10,7 +10,7 @@ public class Configuration : Enumeration
     /// Debug configuration
     /// </summary>
     public static Configuration Debug = new() { Value = nameof(Debug) };
-    
+
     /// <summary>
     /// Release configuration
     /// </summary>

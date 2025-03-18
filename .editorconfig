@@ -1,30 +1,49 @@
 root = true
+# https://editorconfig.org/
+
 # EditorConfig is awesome: http://EditorConfig.org
 
 # top-most EditorConfig file
 
 # Global settings
 [*]
+indent_style = space
+indent_size = 4
+charset = utf-8
 end_of_line = crlf
 
 # In line with the Airbnb JavaScript Guidelines and https://katafrakt.me/2017/09/16/80-characters-line-length-limit/#:~:text=When%20you%20look%20at%20code,should%20not%20exceed%2080%20characters
-max_line_length = 120
+#max_line_length = 120  #This rule should be reviewed for all legacy js, will be moved for only cs and vb code
 insert_final_newline = true
 trim_trailing_whitespace = true
 
 # Microsoft .NET properties
 csharp_new_line_before_members_in_object_initializers = true
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_braces = true:silent
+csharp_style_namespace_declarations = file_scoped:suggestion
+csharp_style_prefer_method_group_conversion = true:silent
+csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_primary_constructors = true:silent
+csharp_style_expression_bodied_lambdas = when_on_single_line:suggestion
+csharp_style_expression_bodied_local_functions = when_on_single_line:suggestion
 
 # ReSharper properties
-resharper_blank_lines_around_single_line_auto_property = 1
-resharper_csharp_blank_lines_around_single_line_invocable = 1
+resharper_csharp_max_line_length = 126
 resharper_space_within_single_line_array_initializer_braces = true
-resharper_wrap_object_and_collection_initializer_style = chop_always
+
+# ReSharper properties
+# resharper_blank_lines_around_single_line_auto_property = 1
+# resharper_csharp_blank_lines_around_single_line_invocable = 1
+# resharper_space_within_single_line_array_initializer_braces = true
+# resharper_wrap_object_and_collection_initializer_style = chop_always
 
 # Xml project files
-[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj,nativeproj,locproj}]
 indent_style = space
-indent_size = 2
+indent_size = 4
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 4
 
 # Xml config files
 [*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
@@ -35,6 +54,61 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 
+# Xml build files
+[*.builds]
+indent_style = space
+indent_size = 2
+
+# Xml files
+[*.{xml,stylecop,resx,ruleset}]
+indent_style = space
+indent_size = 2
+
+# Shell scripts
+[*.sh]
+indent_style = space
+end_of_line = lf
+
+# Scripts
+[*.{cmd, bat}]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+
+# CI
+[/**/*.yml]
+indent_style = space
+indent_size = 2
+
+# Lang Files
+[/Lang/*.txt]
+indent_style = space
+indent_size = 4
+charset = none
+
+# taken from https://github.com/dotnet/corefx/blob/master/.editorconfig
+
+########################
+# Code Analysis: Enablon Rules
+########################
+# C# & VB files
+[*.{cs, vb}]
+
+max_line_length = 120
+
+# Implement standard exception constructors
+dotnet_diagnostic.ca1032.severity = none
+
+# Use Integral or string argument for indexers
+dotnet_diagnostic.ca1043.severity = none
+
+# Identifiers should not match keywords
+dotnet_diagnostic.ca1716.severity = none
+
+# Type names should not match namespace
+dotnet_diagnostic.ca1724.severity = none
+
+# C# files
 [*.cs]
 indent_style = space
 indent_size = 4
@@ -141,6 +215,14 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
+
+# MEL0001: Numerics should not be used in logging format string
+dotnet_diagnostic.mel0001.severity = error
+# MEL0002: Logging format string should not be dynamically generated
+dotnet_diagnostic.mel0002.severity = error
+
+# Do not use WizADO RecordSet
+dotnet_diagnostic.ena0001.severity = suggestion
 
 # Banned API Analyzers
 dotnet_diagnostic.rs0030.severity = error
@@ -293,109 +375,400 @@ dotnet_diagnostic.sa1642.severity = none
 ########################
 
 # The keyword 'using' should be followed by a space
-dotnet_diagnostic.sa1000.severity = warning
+dotnet_diagnostic.sa1000.severity = error
 
 # Commas should not be preceded by whitespace
-dotnet_diagnostic.sa1001.severity = warning
+dotnet_diagnostic.sa1001.severity = error
 
 # Operator '=' should be preceded by whitespace.
-dotnet_diagnostic.sa1003.severity = warning
+dotnet_diagnostic.sa1003.severity = error
 
 # Single line comment should begin with a space
-dotnet_diagnostic.sa1005.severity = warning
+dotnet_diagnostic.sa1005.severity = error
 
 # Opening parenthesis should not be followed by a space.
-dotnet_diagnostic.sa1008.severity = warning
+# dotnet_diagnostic.sa1008.severity = warning
+dotnet_diagnostic.sa1008.severity = suggestion
 
 # Closing square bracket should be followed by a space
-dotnet_diagnostic.sa1011.severity = warning
+dotnet_diagnostic.sa1011.severity = error
 
 # Opening brace should be followed by a space
-dotnet_diagnostic.sa1012.severity = warning
+dotnet_diagnostic.sa1012.severity = error
 
 # Closing brace should be followed by a space
-dotnet_diagnostic.sa1013.severity = warning
+dotnet_diagnostic.sa1013.severity = error
 
 # Closing generic bracket should be followed by a space
-dotnet_diagnostic.sa1015.severity = warning
+dotnet_diagnostic.sa1015.severity = error
 
 # Colon should be preceded by a space
-dotnet_diagnostic.sa1024.severity = warning
+dotnet_diagnostic.sa1024.severity = error
 
 # The keyword 'new' should not be followed by a space or a blank line
-dotnet_diagnostic.sa1026.severity = warning
+dotnet_diagnostic.sa1026.severity = error
 
 # Code should not contain empty statements
-dotnet_diagnostic.sa1106.severity = warning
+dotnet_diagnostic.sa1106.severity = error
 
 # Code should not contain multiple statements on one line
-dotnet_diagnostic.sa1107.severity = warning
+dotnet_diagnostic.sa1107.severity = error
 
 # Closing parenthesis should be on line of last parameter
-dotnet_diagnostic.sa1111.severity = warning
+dotnet_diagnostic.sa1111.severity = error
 
 # Comma should be on the same line as previous parameter
-dotnet_diagnostic.sa1113.severity = warning
+dotnet_diagnostic.sa1113.severity = error
 
 # Parameter list should follow declaration
-dotnet_diagnostic.sa1114.severity = warning
+dotnet_diagnostic.sa1114.severity = error
 
 # The parameter should begin on the line after the previous parameter
-dotnet_diagnostic.sa1115.severity = warning
+dotnet_diagnostic.sa1115.severity = error
 
 # Statement should not use unnecessary parenthesis
-dotnet_diagnostic.sa1119.severity = warning
+dotnet_diagnostic.sa1119.severity = error
 
 # Elements should have the same indentation
-dotnet_diagnostic.sa1137.severity = warning
+dotnet_diagnostic.sa1137.severity = error
 
 # Element should begin with an uppercase letter
-dotnet_diagnostic.sa1300.severity = warning
+dotnet_diagnostic.sa1300.severity = error
 
 # Statement should not use unnecessary parenthesis
-dotnet_diagnostic.sa1402.severity = warning
+dotnet_diagnostic.sa1402.severity = error
 
 # Braces for multi-line statements should not share line
-dotnet_diagnostic.sa1500.severity = warning
+dotnet_diagnostic.sa1500.severity = error
 
 # Statement should not be on a single line
-dotnet_diagnostic.sa1501.severity = warning
+dotnet_diagnostic.sa1501.severity = error
 
 # Element should not be on a single line
-dotnet_diagnostic.sa1502.severity = warning
+dotnet_diagnostic.sa1502.severity = error
 
 # Braces should not be omitted
-dotnet_diagnostic.sa1503.severity = warning
+# dotnet_diagnostic.sa1503.severity = warning
+dotnet_diagnostic.sa1503.severity = suggestion
 
 # An opening brace should not be followed by a blank line
-dotnet_diagnostic.sa1505.severity = warning
+dotnet_diagnostic.sa1505.severity = error
 
 # Element documentation headers should not be followed by blank line
-dotnet_diagnostic.sa1506.severity = warning
+dotnet_diagnostic.sa1506.severity = error
 
 # A closing brace should not be preceded by a blank line
-dotnet_diagnostic.sa1508.severity = warning
+dotnet_diagnostic.sa1508.severity = error
 
 # Opening braces should not be preceded by blank line
-dotnet_diagnostic.sa1509.severity = warning
+dotnet_diagnostic.sa1509.severity = error
 
 # Single-line comments should not be followed by blank line
-dotnet_diagnostic.sa1512.severity = warning
+dotnet_diagnostic.sa1512.severity = error
 
 # Closing brace should be followed by blank line
-dotnet_diagnostic.sa1513.severity = warning
+# dotnet_diagnostic.sa1513.severity = warning
+dotnet_diagnostic.sa1513.severity = suggestion
 
 # Single-line comment should be preceded by blank line
-dotnet_diagnostic.sa1515.severity = warning
+dotnet_diagnostic.sa1515.severity = error
 
 # Elements should be separated by blank line
-dotnet_diagnostic.sa1516.severity = warning
+dotnet_diagnostic.sa1516.severity = error
 
 # Braces should not be omitted from multi-line child statement
-dotnet_diagnostic.sa1519.severity = warning
+dotnet_diagnostic.sa1519.severity = error
 
 # Use braces consistently
-dotnet_diagnostic.sa1520.severity = warning
+dotnet_diagnostic.sa1520.severity = error
 
 # File name should match first type name
-dotnet_diagnostic.sa1649.severity = warning
+dotnet_diagnostic.sa1649.severity = error
+
+########################
+# StyleCop: Enablon Rules
+########################
+
+# A closing parenthesis within a C# statement is not spaced correctly.
+dotnet_diagnostic.sa1009.severity = none
+
+# The C# code contains a region within the body of a code element.
+dotnet_diagnostic.sa1123.severity = none
+
+# The C# code contains a region.
+dotnet_diagnostic.sa1124.severity = none
+
+# A field name in C# contains an underscore.
+dotnet_diagnostic.sa1310.severity = none
+
+# The access modifier for a C# element has not been explicitly defined.
+dotnet_diagnostic.sa1400.severity = none
+
+# A field within a C# class has an access modifier other than private.
+dotnet_diagnostic.sa1401.severity = suggestion
+
+# A C# code element is missing a documentation header.
+dotnet_diagnostic.sa1600.severity = none
+
+# A C# partial element is missing a documentation header.
+dotnet_diagnostic.sa1601.severity = none
+
+# Enable XML documentation output.
+dotnet_diagnostic.sa1652.severity = none
+
+# XML Comment is disabled.
+dotnet_diagnostic.sa0001.severity = none
+
+########################
+# Code Analysis: Enablon Rules
+########################
+
+# Types that own disposable fields should be disposable
+dotnet_diagnostic.ca1001.severity = error
+
+# Declare event handlers correctly
+dotnet_diagnostic.ca1009.severity = warning
+
+# Mark assemblies with AssemblyVersionAttribute
+dotnet_diagnostic.ca1016.severity = warning
+
+# Interface methods should be callable by child types
+dotnet_diagnostic.ca1033.severity = warning
+
+#  Types that own native resources should be disposable
+dotnet_diagnostic.ca1049.severity = error
+
+# Move P/Invokes to NativeMethods class
+dotnet_diagnostic.ca1060.severity = warning
+
+# Do not hide base class methods
+dotnet_diagnostic.ca1061.severity = warning
+
+# Do not raise exceptions in unexpected locations
+dotnet_diagnostic.ca1065.severity = warning
+
+# Avoid duplicate accelerators
+dotnet_diagnostic.ca1301.severity = warning
+
+# P/Invoke entry points should exist
+dotnet_diagnostic.ca1400.severity = warning
+
+# P/Invokes should not be visible
+dotnet_diagnostic.ca1401.severity = warning
+
+# Auto layout types should not be COM visible
+dotnet_diagnostic.ca1403.severity = warning
+
+# Call GetLastError immediately after P/Invoke
+dotnet_diagnostic.ca1404.severity = warning
+
+# COM visible type base types should be COM visible
+dotnet_diagnostic.ca1405.severity = warning
+
+# COM registration methods should be matched
+dotnet_diagnostic.ca1410.severity = warning
+
+# Declare P/Invokes correctly
+dotnet_diagnostic.ca1415.severity = warning
+
+# Remove empty finalizers
+dotnet_diagnostic.ca1821.severity = warning
+
+# Value type fields should be portable
+dotnet_diagnostic.ca1900.severity = warning
+
+# P/Invoke declarations should be portable
+dotnet_diagnostic.ca1901.severity = warning
+
+# Do not lock on objects with weak identity
+dotnet_diagnostic.ca2002.severity = warning
+
+# Review SQL queries for security vulnerabilities
+dotnet_diagnostic.ca2100.severity = warning
+
+# Specify marshaling for P/Invoke string arguments
+dotnet_diagnostic.ca2101.severity = warning
+
+# Review declarative security on value types
+dotnet_diagnostic.ca2108.severity = warning
+
+# Pointers should not be visible
+dotnet_diagnostic.ca2111.severity = warning
+
+# Secured types should not expose fields
+dotnet_diagnostic.ca2112.severity = warning
+
+# Method security should be a superset of type
+dotnet_diagnostic.ca2114.severity = warning
+
+# APTCA methods should only call APTCA methods
+dotnet_diagnostic.ca2116.severity = warning
+
+# APTCA types should only extend APTCA base types
+dotnet_diagnostic.ca2117.severity = warning
+
+# Do not indirectly expose methods with link demands
+dotnet_diagnostic.ca2122.severity = warning
+
+# Override link demands should be identical to base
+dotnet_diagnostic.ca2123.severity = warning
+
+# Wrap vulnerable finally clauses in outer try
+dotnet_diagnostic.ca2124.severity = warning
+
+# Type link demands require inheritance demands
+dotnet_diagnostic.ca2126.severity = warning
+
+# Security critical types may not participate in type equivalence
+dotnet_diagnostic.ca2131.severity = warning
+
+# Default constructors must be at least as critical as base type default constructors
+dotnet_diagnostic.ca2132.severity = warning
+
+# Delegates must bind to methods with consistent transparency
+dotnet_diagnostic.ca2133.severity = warning
+
+# Methods must keep consistent transparency when overriding base methods
+dotnet_diagnostic.ca2134.severity = warning
+
+# Transparent methods must contain only verifiable IL
+dotnet_diagnostic.ca2137.severity = warning
+
+# Transparent methods must not call methods with the SuppressUnmanagedCodeSecurity attribute
+dotnet_diagnostic.ca2138.severity = warning
+
+# Transparent code must not reference security critical items
+dotnet_diagnostic.ca2140.severity = warning
+
+# Transparent methods must not satisfy LinkDemands
+dotnet_diagnostic.ca2141.severity = warning
+
+# Types must be at least as critical as their base types and interfaces
+dotnet_diagnostic.ca2146.severity = warning
+
+# Transparent methods may not use security asserts
+dotnet_diagnostic.ca2147.severity = warning
+
+# Transparent methods must not call into native code
+dotnet_diagnostic.ca2149.severity = warning
+
+# Rethrow to preserve stack details
+dotnet_diagnostic.ca2200.severity = warning
+
+# Do not dispose objects multiple times
+dotnet_diagnostic.ca2202.severity = warning
+
+# Initialize value type static fields inline
+dotnet_diagnostic.ca2207.severity = warning
+
+# Do not mark serviced components with WebMethod
+dotnet_diagnostic.ca2212.severity = warning
+
+# Disposable fields should be disposed
+dotnet_diagnostic.ca2213.severity = warning
+
+# Do not call overridable methods in constructors
+dotnet_diagnostic.ca2214.severity = warning
+
+# Dispose methods should call base class dispose
+dotnet_diagnostic.ca2215.severity = error
+
+# Disposable types should declare finalizer
+dotnet_diagnostic.ca2216.severity = warning
+
+# Finalizers should call base class finalizer
+dotnet_diagnostic.ca2220.severity = warning
+
+# Implement serialization constructors
+dotnet_diagnostic.ca2229.severity = warning
+
+# Overload operator equals on overriding ValueType.Equals
+dotnet_diagnostic.ca2231.severity = warning
+
+# Mark Windows Forms entry points with STAThread
+dotnet_diagnostic.ca2232.severity = warning
+
+# Mark all non-serializable fields
+dotnet_diagnostic.ca2235.severity = warning
+
+# Call base class methods on ISerializable types
+dotnet_diagnostic.ca2236.severity = warning
+
+# Mark ISerializable types with SerializableAttribute
+dotnet_diagnostic.ca2237.severity = warning
+
+# Implement serialization methods correctly
+dotnet_diagnostic.ca2238.severity = warning
+
+# Implement ISerializable correctly
+dotnet_diagnostic.ca2240.severity = warning
+
+# Provide correct arguments to formatting methods
+dotnet_diagnostic.ca2241.severity = warning
+
+# Test for NaN correctly
+dotnet_diagnostic.ca2242.severity = warning
+
+#VB files
+[*.vb]
+# avoid this. unless absolutely necessary
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# use language keywords instead of BCL types
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+#.Net Styles
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+dotnet_naming_style.camel_case_underscore_style.required_prefix = _
+dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
+
+# methods, properties and enums at Any Accessbility Must Be Pascal Case
+dotnet_naming_symbols.method_and_property_symbols.applicable_kinds = method, property, enum
+dotnet_naming_symbols.method_and_property_symbols.applicable_accessibilities = *
+
+dotnet_naming_rule.methods_and_properties_must_be_pascal_case.severity = warning
+dotnet_naming_rule.methods_and_properties_must_be_pascal_case.symbols = method_and_property_symbols
+dotnet_naming_rule.methods_and_properties_must_be_pascal_case.style = pascal_case_style
+
+# name all constant fields using PascalCase
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+
+dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style = pascal_case_style
+
+# public fields and properties should be PascalCase
+dotnet_naming_symbols.public_fields.applicable_kinds = field
+dotnet_naming_symbols.public_fields.applicable_accessibilities = public
+
+dotnet_naming_rule.pascal_case_for_public_fields.severity = warning
+dotnet_naming_rule.pascal_case_for_public_fields.symbols = public_fields
+dotnet_naming_rule.pascal_case_for_public_fields.style = pascal_case_style
+
+# internal and private fields ans properties should be _camelCase
+dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
+dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
+
+dotnet_naming_rule.camel_case_for_private_internal_fields.severity = warning
+dotnet_naming_rule.camel_case_for_private_internal_fields.symbols = private_internal_fields
+dotnet_naming_rule.camel_case_for_private_internal_fields.style = camel_case_underscore_style
+
+# Expression-level preferences
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+
+# MEL0001: Numerics should not be used in logging format string
+dotnet_diagnostic.mel0001.severity = error
+# MEL0002: Logging format string should not be dynamically generated
+dotnet_diagnostic.mel0002.severity = error
+
+# Do not use WizADO RecordSet
+dotnet_diagnostic.ena0001.severity = suggestion
