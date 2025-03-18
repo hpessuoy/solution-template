@@ -98,6 +98,7 @@ class Build : NukeBuild
 
     Target Lint => d => d
         .DependsOn(Restore)
+        .Before(FormatCheck)
         .Executes(() =>
         {
             DotNetBuild(configurator => configurator
@@ -180,7 +181,6 @@ class Build : NukeBuild
         });
 
     Target PublishInfra => d => d
-        .Unlisted()
         .After(Publish)
         .Executes(() =>
         {
@@ -189,7 +189,6 @@ class Build : NukeBuild
         });
 
     Target PublishDeploy => d => d
-        .Unlisted()
         .After(PublishInfra)
         .Executes(() =>
         {
@@ -198,7 +197,7 @@ class Build : NukeBuild
         });
 
     Target BuildContainer => d => d
-        .Unlisted()
+        .Before(PushDeploymentContainer)
         .After(Publish, PublishInfra, PublishDeploy)
         .Executes(() =>
         {
