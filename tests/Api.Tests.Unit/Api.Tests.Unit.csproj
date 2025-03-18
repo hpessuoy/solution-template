@@ -9,6 +9,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
