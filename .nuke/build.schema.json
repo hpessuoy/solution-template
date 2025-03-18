@@ -29,7 +29,6 @@
         "Compile",
         "ConfigureNuget",
         "Default",
-        "FormatCheck",
         "IntegrationTests",
         "Lint",
         "Publish",

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Nuke.Common.Tools.Docker;
 using SimpleExec;
@@ -43,7 +44,7 @@ class Build : NukeBuild
     const string GithubContainerRegistryNamespace = "ghcr.io/hpessuoy/solution-template";
     const string DeploymentContainerImageName = "solution-template-deployment";
 
-    readonly string DeploymentImageTag = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER") ??
+    readonly string _deploymentImageTag = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER") ??
                                           "GITHUB_RUN_NUMBER-not-available";
 
     Target ConfigureNuget => tgt => tgt
@@ -96,7 +97,8 @@ class Build : NukeBuild
                 .SetVerbosity(DotNetVerbosity.quiet));
         });
 
-    Target Compile => d => d
+    [SuppressMessage("Style", "IDE0051:Remove unused private member", Justification = "Used via reflection")]
+    Target Lint => d => d
         .DependsOn(Restore)
         .Executes(() =>
         {
@@ -106,6 +108,18 @@ class Build : NukeBuild
                 .SetVerbosity(DotNetVerbosity.quiet)
                 .SetRepositoryUrl(GitRepository.HttpsUrl)
                 .AddWarningsAsErrors()
+            );
+        });
+
+    Target Compile => d => d
+        .DependsOn(Restore)
+        .Executes(() =>
+        {
+            DotNetBuild(configurator => configurator
+                .SetConfiguration(Configuration)
+                .SetNoRestore(true)
+                .SetVerbosity(DotNetVerbosity.quiet)
+                .SetRepositoryUrl(GitRepository.HttpsUrl)
             );
         });
 
@@ -186,7 +200,7 @@ class Build : NukeBuild
                 .SetTag(DeploymentContainerImageName));
 
             Command.Run("docker",
-                $"tag {DeploymentContainerImageName}:latest {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
+                $"tag {DeploymentContainerImageName}:latest {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{_deploymentImageTag}");
         });
 
     Target PushDeploymentContainer => d => d
@@ -194,7 +208,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             Command.Run("docker",
-                $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
+                $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{_deploymentImageTag}");
         });
 
     Target Default => d => d
