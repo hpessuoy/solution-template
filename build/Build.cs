@@ -43,7 +43,7 @@ class Build : NukeBuild
     const string GithubContainerRegistryNamespace = "ghcr.io/hpessuoy/solution-template";
     const string DeploymentContainerImageName = "solution-template-deployment";
 
-    readonly string _deploymentImageTag = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER") ??
+    readonly string DeploymentImageTag = Environment.GetEnvironmentVariable("GITHUB_RUN_NUMBER") ??
                                           "GITHUB_RUN_NUMBER-not-available";
 
     Target ConfigureNuget => tgt => tgt
@@ -186,7 +186,7 @@ class Build : NukeBuild
                 .SetTag(DeploymentContainerImageName));
 
             Command.Run("docker",
-                $"tag {DeploymentContainerImageName}:latest {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{_deploymentImageTag}");
+                $"tag {DeploymentContainerImageName}:latest {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
         });
 
     Target PushDeploymentContainer => d => d
@@ -194,7 +194,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             Command.Run("docker",
-                $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{_deploymentImageTag}");
+                $"push {GithubContainerRegistryNamespace}/{DeploymentContainerImageName}:{DeploymentImageTag}");
         });
 
     Target Default => d => d
