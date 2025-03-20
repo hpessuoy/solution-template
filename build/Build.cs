@@ -113,6 +113,7 @@ class Build : NukeBuild
 
     Target Compile => d => d
         .DependsOn(Restore)
+        .After(SonarStartCodeAnalysis)
         .Executes(() =>
         {
             DotNetBuild(configurator => configurator
@@ -213,6 +214,39 @@ class Build : NukeBuild
 
     Target Default => d => d
         .DependsOn(UnitTests, IntegrationTests, Publish, PublishInfra, PublishDeploy, BuildContainer);
+
+    [Parameter] [Secret] public readonly string SonarToken;
+    [Parameter] [Secret] public readonly string SonarProjectKey;
+    [Parameter] public readonly string SonarHostUrl;
+    [Parameter] public readonly string ShortSha;
+    
+    Target SonarStartCodeAnalysis => d => d
+        .Before(SonarEndCodeAnalysis)
+        .Executes(() =>
+        {
+            Command.Run("dotnet", "tool install --global dotnet-sonarscanner");
+            Command.Run("./.sonar/scanner/dotnet-sonarscanner",
+                $"""
+                begin \
+                /k:"{SonarProjectKey}" \
+                /v:"{ShortSha}" \
+                /d:sonar.token="{SonarToken}" \
+                /d:sonar.host.url="{SonarHostUrl}" \
+                /d:sonar.cs.vstest.reportsPaths="{TestResultsDirectory}/**/*.trx" \
+                /d:sonar.cs.vscoveragexml.reportsPaths="{CoverageReportsDirectory}/coverage/**/*.xml"
+                """);
+        });
+    
+    Target SonarEndCodeAnalysis => d => d
+        .After(SonarStartCodeAnalysis)
+        .Executes(() =>
+        {
+            Command.Run("./.sonar/scanner/dotnet-sonarscanner",
+                $"""
+                 end \
+                 /d:sonar.token="{SonarToken}" \
+                 """);
+        });
 
     public static int Main() => Execute<Build>(x => x.Default);
 }
