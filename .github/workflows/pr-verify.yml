@@ -122,5 +122,5 @@ jobs:
           SHORT_SHA: ${{steps.git_version.outputs.shortSha}}
         uses: ./.github/templates/build-nuke
         with:
-          nukeStepName: "Run Code Analysis"
-          nukeTarget: "SonarStartCodeAnalysis Compile SonarEndCodeAnalysis"
+          stepName: "Run Code Analysis"
+          target: "SonarStartCodeAnalysis Compile SonarEndCodeAnalysis"
