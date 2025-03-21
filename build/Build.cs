@@ -225,6 +225,7 @@ class Build : NukeBuild
     const string SonarQubeScannerFramework = "net9.0";
     
     Target SonarStartCodeAnalysis => d => d
+        .Before(Compile)
         .Before(SonarEndCodeAnalysis)
         .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(SonarToken))
         .Executes(() =>
@@ -261,6 +262,7 @@ class Build : NukeBuild
 //         });
     
     Target SonarEndCodeAnalysis => d => d
+        .After(Compile)
         .After(SonarStartCodeAnalysis)
         .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(SonarToken))
         .Executes(() =>
