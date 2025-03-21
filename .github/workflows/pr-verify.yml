@@ -120,7 +120,7 @@ jobs:
           SONAR_HOST_URL: "https://sonarcloud.io"
           SONAR_ORGANIZATION: "hpessuoy"
           SONAR_PROJECT_KEY: "hpessuoy_solution-template"
-          SHORT_SHA: ${{steps.git_version.outputs.shortSha}}
+#          SHORT_SHA: ${{steps.git_version.outputs.shortSha}}
         uses: ./.github/templates/build-nuke
         with:
           stepName: "Run Code Analysis"

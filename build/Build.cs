@@ -222,19 +222,21 @@ class Build : NukeBuild
     [Parameter] public readonly string SonarHostUrl;
     [Parameter] public readonly string ShortSha;
     
+    const string SonarQubeScannerFramework = "net9.0";
+    
     Target SonarStartCodeAnalysis => d => d
         .Before(SonarEndCodeAnalysis)
         .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(SonarToken))
         .Executes(() =>
         {
-            const string sonarQubeScannerFramework = "net9.0";
+            
             SonarScannerTasks.SonarScannerBegin(settings =>
             {
                 settings = settings
                     .SetServer(SonarHostUrl)
                     .SetToken(SonarToken)
                     .SetSourceEncoding("UTF-8")
-                    .SetFramework(sonarQubeScannerFramework)
+                    .SetFramework(SonarQubeScannerFramework)
                     .SetOrganization(SonarOrganization)
                     .SetProjectKey(SonarProjectKey)
                     .SetVSTestReports(TestResultsDirectory / "*.trx")
@@ -260,14 +262,26 @@ class Build : NukeBuild
     
     Target SonarEndCodeAnalysis => d => d
         .After(SonarStartCodeAnalysis)
+        .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(SonarToken))
         .Executes(() =>
         {
-            Command.Run("./.sonar/scanner/dotnet-sonarscanner",
-                $"""
-                 end \
-                 /d:sonar.token="{SonarToken}" \
-                 """);
+            SonarScannerTasks.SonarScannerEnd(settings =>
+            {
+                settings = settings
+                    .SetToken(SonarToken)
+                    .SetFramework(SonarQubeScannerFramework);
+
+                return settings;
+            });
         });
+//         .Executes(() =>
+//         {
+//             Command.Run("./.sonar/scanner/dotnet-sonarscanner",
+//                 $"""
+//                  end \
+//                  /d:sonar.token="{SonarToken}" \
+//                  """);
+//         });
 
     public static int Main() => Execute<Build>(x => x.Default);
 }
