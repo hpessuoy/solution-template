@@ -222,36 +222,15 @@ class Build : NukeBuild
     [Parameter] public readonly string SonarHostUrl;
     [Parameter] public readonly string ShortSha;
 
-    // const string SonarQubeScannerFramework = "net9.0";
-
     Target SonarStartCodeAnalysis => d => d
         .Before(Compile)
         .Before(SonarEndCodeAnalysis)
         .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(SonarToken))
         .Executes(() =>
         {
-            // Command.Run("dotnet", "tool install --global dotnet-sonarscanner");
             Command.Run("./.sonar/scanner/dotnet-sonarscanner",
                 $"""begin /o:{SonarOrganization} /k:"{SonarProjectKey}" /v:"{ShortSha}" /d:sonar.token="{SonarToken}" /d:sonar.host.url="{SonarHostUrl}" /d:sonar.sourceEncoding=UTF-8 /d:sonar.cs.vstest.reportsPaths="{TestResultsDirectory}/**/*.trx" /d:sonar.cs.vscoveragexml.reportsPaths="{CoverageReportsDirectory}/coverage/**/*.xml""");
         });
-    // .Executes(() =>
-    // {
-    //     
-    //     SonarScannerTasks.SonarScannerBegin(settings =>
-    //     {
-    //         settings = settings
-    //             .SetServer(SonarHostUrl)
-    //             .SetToken(SonarToken)
-    //             .SetSourceEncoding("UTF-8")
-    //             .SetFramework(SonarQubeScannerFramework)
-    //             .SetOrganization(SonarOrganization)
-    //             .SetProjectKey(SonarProjectKey)
-    //             .SetVSTestReports(TestResultsDirectory / "*.trx")
-    //             .AddOpenCoverPaths(CoverageReportsDirectory / "*.xml");
-    //         
-    //         return settings;
-    //     });
-    // });
 
     Target SonarEndCodeAnalysis => d => d
         .After(Compile)
@@ -262,17 +241,6 @@ class Build : NukeBuild
             Command.Run("./.sonar/scanner/dotnet-sonarscanner",
                 $"""end /d:sonar.token="{SonarToken}" """);
         });
-    //     .Executes(() =>
-    // {
-    //     SonarScannerTasks.SonarScannerEnd(settings =>
-    //     {
-    //         settings = settings
-    //             .SetToken(SonarToken)
-    //             .SetFramework(SonarQubeScannerFramework);
-    //
-    //         return settings;
-    //     });
-    // });
 
     public static int Main() => Execute<Build>(x => x.Default);
 }
