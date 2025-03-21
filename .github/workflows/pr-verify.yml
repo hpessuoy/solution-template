@@ -96,13 +96,6 @@ jobs:
           path: ${{ inputs.gh_working_directory }}/.sonar/scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
-          
-#      - name: Log into registry
-#        uses: docker/login-action@v3
-#        with:
-#          registry: ghcr.io
-#          username: ${{github.actor}}
-#          password: ${{secrets.GITHUB_TOKEN}}
 
       - name: Download Code Coverage
         uses: actions/download-artifact@v4
