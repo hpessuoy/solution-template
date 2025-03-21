@@ -100,6 +100,14 @@ jobs:
           path: ${{ inputs.gh_working_directory }}/.sonar/scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
+          
+      - name: Install SonarQube scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: pwsh
+        working-directory: ${{ inputs.gh_working_directory }}
+        run: |
+          New-Item -Path ./.sonar/scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
 
       - name: Download Code Coverage
         uses: actions/download-artifact@v4
