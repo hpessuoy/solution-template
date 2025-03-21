@@ -59,6 +59,11 @@ jobs:
     needs: Unit-Tests
     runs-on: ubuntu-latest
     steps:
+      - name: Setup .NET for Build
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: "global.json"
+          
       - name: Checkout
         uses: actions/checkout@v4
         with:
