@@ -61,11 +61,12 @@ jobs:
     steps:
       - name: Debug - List files in root
         run: ls -la
+        working-directory: .
 
       - name: Setup .NET for Build
         uses: actions/setup-dotnet@v4
         with:
-          global-json-file: "./global.json"
+          global-json-file: "global.json"
           
       - name: Checkout
         uses: actions/checkout@v4
