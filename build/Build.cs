@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Nuke.Common.Tools.Docker;
+using Nuke.Common.Tools.SonarScanner;
 using SimpleExec;
 
 class Build : NukeBuild
@@ -222,20 +223,36 @@ class Build : NukeBuild
     
     Target SonarStartCodeAnalysis => d => d
         .Before(SonarEndCodeAnalysis)
+        .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(SonarToken))
         .Executes(() =>
         {
-            Command.Run("dotnet", "tool install --global dotnet-sonarscanner");
-            Command.Run("./.sonar/scanner/dotnet-sonarscanner",
-                $"""
-                begin \
-                /k:"{SonarProjectKey}" \
-                /v:"{ShortSha}" \
-                /d:sonar.token="{SonarToken}" \
-                /d:sonar.host.url="{SonarHostUrl}" \
-                /d:sonar.cs.vstest.reportsPaths="{TestResultsDirectory}/**/*.trx" \
-                /d:sonar.cs.vscoveragexml.reportsPaths="{CoverageReportsDirectory}/coverage/**/*.xml"
-                """);
+            SonarScannerTasks.SonarScannerBegin(settings =>
+            {
+                settings = settings
+                    .SetServer(SonarHostUrl)
+                    .SetToken(SonarToken)
+                    .SetSourceEncoding("UTF-8")
+                    .SetProjectKey(SonarProjectKey)
+                    .SetVSTestReports(TestResultsDirectory / "*.trx")
+                    .AddOpenCoverPaths(CoverageReportsDirectory / "*.xml");
+                
+                return settings;
+            });
         });
+//         .Executes(() =>
+//         {
+//             Command.Run("dotnet", "tool install --global dotnet-sonarscanner");
+//             Command.Run("./.sonar/scanner/dotnet-sonarscanner",
+//                 $"""
+//                 begin \
+//                 /k:"{SonarProjectKey}" \
+//                 /v:"{ShortSha}" \
+//                 /d:sonar.token="{SonarToken}" \
+//                 /d:sonar.host.url="{SonarHostUrl}" \
+//                 /d:sonar.cs.vstest.reportsPaths="{TestResultsDirectory}/**/*.trx" \
+//                 /d:sonar.cs.vscoveragexml.reportsPaths="{CoverageReportsDirectory}/coverage/**/*.xml"
+//                 """);
+//         });
     
     Target SonarEndCodeAnalysis => d => d
         .After(SonarStartCodeAnalysis)
