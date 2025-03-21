@@ -59,6 +59,9 @@ jobs:
     needs: Unit-Tests
     runs-on: ubuntu-latest
     steps:
+      - name: Debug - List files in root
+        run: ls -la
+
       - name: Setup .NET for Build
         uses: actions/setup-dotnet@v4
         with:
