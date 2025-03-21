@@ -118,6 +118,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: "https://sonarcloud.io"
+          SONAR_ORGANIZATION: "hpessuoy"
           SONAR_PROJECT_KEY: "hpessuoy_solution-template"
           SHORT_SHA: ${{steps.git_version.outputs.shortSha}}
         uses: ./.github/templates/build-nuke

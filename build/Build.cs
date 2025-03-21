@@ -218,6 +218,7 @@ class Build : NukeBuild
 
     [Parameter] [Secret] public readonly string SonarToken;
     [Parameter] [Secret] public readonly string SonarProjectKey;
+    [Parameter] [Secret] public readonly string SonarOrganization;
     [Parameter] public readonly string SonarHostUrl;
     [Parameter] public readonly string ShortSha;
     
@@ -226,12 +227,15 @@ class Build : NukeBuild
         .OnlyWhenStatic(() => !string.IsNullOrWhiteSpace(SonarToken))
         .Executes(() =>
         {
+            const string sonarQubeScannerFramework = "net9.0";
             SonarScannerTasks.SonarScannerBegin(settings =>
             {
                 settings = settings
                     .SetServer(SonarHostUrl)
                     .SetToken(SonarToken)
                     .SetSourceEncoding("UTF-8")
+                    .SetFramework(sonarQubeScannerFramework)
+                    .SetOrganization(SonarOrganization)
                     .SetProjectKey(SonarProjectKey)
                     .SetVSTestReports(TestResultsDirectory / "*.trx")
                     .AddOpenCoverPaths(CoverageReportsDirectory / "*.xml");
