@@ -222,7 +222,7 @@ class Build : NukeBuild
     [Parameter] public readonly string SonarHostUrl;
     [Parameter] public readonly string ShortSha;
     
-    const string SonarQubeScannerFramework = "net9.0";
+    // const string SonarQubeScannerFramework = "net9.0";
     
     Target SonarStartCodeAnalysis => d => d
         .Before(Compile)
